@@ -1,16 +1,14 @@
-import { Dispatch, PropsWithChildren, useState } from 'react';
+import { PropsWithChildren } from 'react';
 import {
     json,
     Link,
     Links,
     Meta,
-    NavLink,
     Outlet,
     Scripts,
-    ScrollRestoration,
-    useNavigate
+    ScrollRestoration
 } from '@remix-run/react';
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import {
     IconButton,
     ThemePanel,
@@ -18,75 +16,25 @@ import {
     Button,
     Link as RadixLink
 } from '@radix-ui/themes';
-
-import { Paths } from './utils/constants';
 import { MenuIcon, MoonIcon, SunIcon } from 'lucide-react';
+
 import { Drawer } from './components/Drawer';
 import { getUniqueId } from './utils/string';
+import { getUser } from './utils/auth.server';
+import { Paths } from './utils/constants';
+import { useOptionalUser } from './hooks/useOptionalUser';
+import DesktopNav from './components/DesktopNav';
+import MobileNav from './components/MobileNav';
+import useLocalStorage from './hooks/useLocalStorage';
 import useToggle from './hooks/useToggle';
 
 import './tailwind.css';
 import '@radix-ui/themes/styles.css';
-import { getUser } from './utils/auth.server';
-import { useOptionalUser } from './hooks/useOptionalUser';
-
-interface NavLinkType {
-    id: string;
-    end: boolean;
-    show: boolean;
-    text: string;
-    to: Paths | string;
-}
-
-const themePanelOn = process.env.NODE_ENV === 'development';
-
-export const links: LinksFunction = () => [];
-
-const DesktopNav = ({ navLinks }: { navLinks: NavLinkType[] }) => (
-    <ul className="hidden sm:flex sm:gap-4 sm:items-center">
-        {navLinks.map((linkObj) => (
-            <li key={linkObj.id}>
-                <RadixLink asChild>
-                    <NavLink to={linkObj.to}>{linkObj.text}</NavLink>
-                </RadixLink>
-            </li>
-        ))}
-    </ul>
-);
-
-const MobileNav = ({
-    navLinks,
-    toggleDrawer
-}: {
-    navLinks: NavLinkType[];
-    toggleDrawer: Dispatch<boolean>;
-}) => {
-    const navigate = useNavigate();
-
-    const handleLinkClick = (to: string) => () => {
-        toggleDrawer(false);
-        navigate(to);
-    };
-
-    return (
-        <ul className="space-y-2">
-            {navLinks.map((linkObj) => (
-                <li key={linkObj.id}>
-                    <RadixLink asChild>
-                        <NavLink
-                            to={linkObj.to}
-                            onClick={handleLinkClick(linkObj.to)}
-                        >
-                            {linkObj.text}
-                        </NavLink>
-                    </RadixLink>
-                </li>
-            ))}
-        </ul>
-    );
-};
 
 type ThemeClassNameType = 'light' | 'dark';
+
+const STORED_THEME_VALUE = `storedThemeValue`;
+const themePanelOn = process.env.NODE_ENV === 'development';
 
 export async function loader({ request }: LoaderFunctionArgs) {
     return json({ user: await getUser(request) });
@@ -95,7 +43,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export function Layout({ children }: PropsWithChildren) {
     const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
     const [themeClassName, setThemeClassName] =
-        useState<ThemeClassNameType>('light');
+        useLocalStorage<ThemeClassNameType>(STORED_THEME_VALUE, 'light');
     const user = useOptionalUser();
 
     const navLinksArr = [
@@ -154,7 +102,7 @@ export function Layout({ children }: PropsWithChildren) {
                                 <DesktopNav navLinks={navLinksArr} />
                             </div>
                             <ul className="hidden sm:flex items-center gap-4">
-                                {user && (
+                                {user ? (
                                     <li>
                                         <RadixLink asChild>
                                             <Link
@@ -162,6 +110,17 @@ export function Layout({ children }: PropsWithChildren) {
                                                 className="underline"
                                             >
                                                 Logout
+                                            </Link>
+                                        </RadixLink>
+                                    </li>
+                                ) : (
+                                    <li>
+                                        <RadixLink asChild>
+                                            <Link
+                                                to={Paths.LOGIN}
+                                                className="underline"
+                                            >
+                                                Login
                                             </Link>
                                         </RadixLink>
                                     </li>

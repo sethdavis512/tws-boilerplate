@@ -8,7 +8,13 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { loginSchema } from '~/utils/validations';
 import { getUser, login } from '~/utils/auth.server';
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
-import { Button, Container, TextField } from '@radix-ui/themes';
+import {
+    Button,
+    Container,
+    Heading,
+    TextField,
+    Link as RadixLink
+} from '@radix-ui/themes';
 import { Paths } from '../utils/constants';
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -18,8 +24,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const submission = parseWithZod(formData, { schema: loginSchema });
-
-    console.log(Object.fromEntries(formData));
 
     // Report the submission to client if it is not successful
     if (submission.status !== 'success') {
@@ -37,37 +41,45 @@ export default function Route() {
     });
 
     return (
-        <Container className="pt-12">
-            <h1 className="text-4xl font-bold mb-8">Login</h1>
-            <Form
-                method="POST"
-                {...getFormProps(form)}
-                className="space-y-3 mb-8"
-            >
-                <div className="space-y-2">
-                    <label htmlFor="email">Email</label>
-                    <TextField.Root
-                        // placeholder="Search the docs…"
-                        {...getInputProps(fields.email, { type: 'email' })}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label htmlFor="password">Password</label>
-                    <TextField.Root
-                        // placeholder="Search the docs…"
-                        {...getInputProps(fields.password, {
-                            type: 'password'
-                        })}
-                    />
-                </div>
-                <Button type="submit">Sign in</Button>
-            </Form>
-            <p>
-                {`Don't have an account?`}
-                <Link to="/join" className="pl-2 text-blue-500">
-                    Click to join
-                </Link>
-            </p>
+        <Container>
+            <div className="max-w-lg mx-auto border dark:border-zinc-700 p-4 rounded-lg bg-white dark:bg-zinc-800">
+                <Heading as="h1" className="text-4xl font-bold mb-8">
+                    Login
+                </Heading>
+                <Form
+                    method="POST"
+                    {...getFormProps(form)}
+                    className="space-y-3 mb-8"
+                >
+                    <div className="space-y-2">
+                        <label htmlFor="email">Email</label>
+                        <TextField.Root
+                            // placeholder="Search the docs…"
+                            {...getInputProps(fields.email, { type: 'email' })}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label htmlFor="password">Password</label>
+                        <TextField.Root
+                            // placeholder="Search the docs…"
+                            {...getInputProps(fields.password, {
+                                type: 'password'
+                            })}
+                        />
+                    </div>
+                    <Button type="submit" variant="solid">
+                        Sign in
+                    </Button>
+                </Form>
+                <p>
+                    {`Don't have an account?`}
+                    <RadixLink asChild>
+                        <Link to="/join" className="pl-2 underline">
+                            Click to join
+                        </Link>
+                    </RadixLink>
+                </p>
+            </div>
         </Container>
     );
 }

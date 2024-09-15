@@ -1,5 +1,7 @@
 import { Dispatch, PropsWithChildren, useState } from 'react';
 import {
+    json,
+    Link,
     Links,
     Meta,
     NavLink,
@@ -8,8 +10,14 @@ import {
     ScrollRestoration,
     useNavigate
 } from '@remix-run/react';
-import type { LinksFunction } from '@remix-run/node';
-import { IconButton, ThemePanel, Theme, Button } from '@radix-ui/themes';
+import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
+import {
+    IconButton,
+    ThemePanel,
+    Theme,
+    Button,
+    Link as RadixLink
+} from '@radix-ui/themes';
 
 import { Paths } from './utils/constants';
 import { MenuIcon, MoonIcon, SunIcon } from 'lucide-react';
@@ -19,64 +27,40 @@ import useToggle from './hooks/useToggle';
 
 import './tailwind.css';
 import '@radix-ui/themes/styles.css';
+import { getUser } from './utils/auth.server';
+import { useOptionalUser } from './hooks/useOptionalUser';
+
+interface NavLinkType {
+    id: string;
+    end: boolean;
+    show: boolean;
+    text: string;
+    to: Paths | string;
+}
 
 const themePanelOn = process.env.NODE_ENV === 'development';
 
 export const links: LinksFunction = () => [];
 
-const navLinksArr = [
-    {
-        end: true,
-        isDesktop: true,
-        isMobile: true,
-        text: 'Home',
-        to: Paths.HOME
-    },
-    {
-        end: false,
-        isDesktop: true,
-        isMobile: true,
-        text: 'Dashboard',
-        to: Paths.DASHBOARD
-    }
-].map((linkObj) => ({
-    ...linkObj,
-    id: getUniqueId('nav-link', 4)
-}));
-
-const DesktopNav = ({
-    themeClassName,
-    toggleTheme
-}: {
-    themeClassName: ThemeClassNameType;
-    toggleTheme: (t: ThemeClassNameType) => void;
-}) => (
-    <div className="hidden sm:flex sm:justify-between">
-        <ul className="flex gap-4 sm:items-center">
-            {navLinksArr.map((linkObj) => (
-                <li key={linkObj.id}>
+const DesktopNav = ({ navLinks }: { navLinks: NavLinkType[] }) => (
+    <ul className="hidden sm:flex sm:gap-4 sm:items-center">
+        {navLinks.map((linkObj) => (
+            <li key={linkObj.id}>
+                <RadixLink asChild>
                     <NavLink to={linkObj.to}>{linkObj.text}</NavLink>
-                </li>
-            ))}
-        </ul>
-        <ul>
-            <li>
-                <IconButton
-                    variant="ghost"
-                    onClick={() =>
-                        toggleTheme(
-                            themeClassName === 'light' ? 'dark' : 'light'
-                        )
-                    }
-                >
-                    {themeClassName === 'light' ? <MoonIcon /> : <SunIcon />}
-                </IconButton>
+                </RadixLink>
             </li>
-        </ul>
-    </div>
+        ))}
+    </ul>
 );
 
-const MobileNav = ({ toggleDrawer }: { toggleDrawer: Dispatch<boolean> }) => {
+const MobileNav = ({
+    navLinks,
+    toggleDrawer
+}: {
+    navLinks: NavLinkType[];
+    toggleDrawer: Dispatch<boolean>;
+}) => {
     const navigate = useNavigate();
 
     const handleLinkClick = (to: string) => () => {
@@ -86,20 +70,16 @@ const MobileNav = ({ toggleDrawer }: { toggleDrawer: Dispatch<boolean> }) => {
 
     return (
         <ul className="space-y-2">
-            {navLinksArr.map((linkObj) => (
+            {navLinks.map((linkObj) => (
                 <li key={linkObj.id}>
-                    <NavLink
-                        to={linkObj.to}
-                        className={({ isActive }) =>
-                            `rounded-lg block p-3 ${
-                                isActive ? 'bg-zinc-200 dark:bg-zinc-700' : ''
-                            }`
-                        }
-                        onClick={handleLinkClick(linkObj.to)}
-                        end={linkObj.end}
-                    >
-                        {linkObj.text}
-                    </NavLink>
+                    <RadixLink asChild>
+                        <NavLink
+                            to={linkObj.to}
+                            onClick={handleLinkClick(linkObj.to)}
+                        >
+                            {linkObj.text}
+                        </NavLink>
+                    </RadixLink>
                 </li>
             ))}
         </ul>
@@ -108,13 +88,44 @@ const MobileNav = ({ toggleDrawer }: { toggleDrawer: Dispatch<boolean> }) => {
 
 type ThemeClassNameType = 'light' | 'dark';
 
+export async function loader({ request }: LoaderFunctionArgs) {
+    return json({ user: await getUser(request) });
+}
+
 export function Layout({ children }: PropsWithChildren) {
     const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
     const [themeClassName, setThemeClassName] =
         useState<ThemeClassNameType>('light');
+    const user = useOptionalUser();
+
+    const navLinksArr = [
+        {
+            end: true,
+            show: true,
+            text: 'Home',
+            to: Paths.HOME
+        },
+        {
+            end: true,
+            show: true,
+            text: 'About',
+            to: Paths.ABOUT
+        },
+        {
+            end: false,
+            show: Boolean(user),
+            text: 'Dashboard',
+            to: Paths.DASHBOARD
+        }
+    ].map((linkObj) => ({
+        ...linkObj,
+        id: getUniqueId('nav-link', 4)
+    }));
+
+    const isThemeLight = themeClassName === 'light';
 
     return (
-        <html lang="en">
+        <html lang="en" className={themeClassName}>
             <head>
                 <meta charSet="utf-8" />
                 <meta
@@ -125,24 +136,58 @@ export function Layout({ children }: PropsWithChildren) {
                 <Links />
             </head>
             <body>
-                <Theme
-                    appearance="inherit"
-                    className={`${themeClassName} flex flex-col`}
-                >
+                <Theme appearance="inherit" className={`flex flex-col`}>
                     <header className="border-b dark:border-b-zinc-700 px-4 py-4">
-                        <nav className="flex items-center w-full gap-4">
-                            <div className="sm:hidden">
-                                <IconButton onClick={toggleDrawerOpen}>
-                                    <MenuIcon />
-                                </IconButton>
+                        <nav className="flex items-center justify-between gap-4">
+                            <div className="flex gap-6 items-center">
+                                <div className="sm:hidden">
+                                    <IconButton
+                                        onClick={toggleDrawerOpen}
+                                        variant="soft"
+                                    >
+                                        <MenuIcon />
+                                    </IconButton>
+                                </div>
+                                <RadixLink asChild weight="bold">
+                                    <Link to={Paths.HOME}>TWS</Link>
+                                </RadixLink>
+                                <DesktopNav navLinks={navLinksArr} />
                             </div>
-                            <DesktopNav
-                                themeClassName={themeClassName}
-                                toggleTheme={setThemeClassName}
-                            />
+                            <ul className="hidden sm:flex items-center gap-4">
+                                {user && (
+                                    <li>
+                                        <RadixLink asChild>
+                                            <Link
+                                                to={Paths.LOGOUT}
+                                                className="underline"
+                                            >
+                                                Logout
+                                            </Link>
+                                        </RadixLink>
+                                    </li>
+                                )}
+                                <li>
+                                    <IconButton
+                                        variant="ghost"
+                                        onClick={() =>
+                                            setThemeClassName(
+                                                isThemeLight ? 'dark' : 'light'
+                                            )
+                                        }
+                                    >
+                                        {isThemeLight ? (
+                                            <MoonIcon />
+                                        ) : (
+                                            <SunIcon />
+                                        )}
+                                    </IconButton>
+                                </li>
+                            </ul>
                         </nav>
                     </header>
-                    <main className="flex-1 p-4">{children}</main>
+                    <main className="flex-1 p-4 bg-zinc-100 dark:bg-zinc-900">
+                        {children}
+                    </main>
                     <footer className="border-t dark:border-t-zinc-700 px-4 py-8">
                         Fooooter
                     </footer>
@@ -153,30 +198,25 @@ export function Layout({ children }: PropsWithChildren) {
                         containerClassName={`p-0 flex flex-col justify-between`}
                     >
                         <div className="p-4">
-                            <MobileNav toggleDrawer={toggleDrawerOpen} />
+                            <MobileNav
+                                navLinks={navLinksArr}
+                                toggleDrawer={toggleDrawerOpen}
+                            />
                         </div>
-                        <div className="px-6 py-4 border-t dark:border-t-zinc-700">
+                        <div className="p-4 border-t dark:border-t-zinc-700">
                             <Button
                                 className="flex gap-2"
-                                variant="ghost"
+                                variant="soft"
                                 onClick={() =>
                                     setThemeClassName(
-                                        themeClassName === 'light'
-                                            ? 'dark'
-                                            : 'light'
+                                        isThemeLight ? 'dark' : 'light'
                                     )
                                 }
                             >
-                                {themeClassName === 'light' ? (
-                                    <MoonIcon />
-                                ) : (
-                                    <SunIcon />
-                                )}
+                                {isThemeLight ? <MoonIcon /> : <SunIcon />}
                                 <span className="block">
                                     {`Change to ${
-                                        themeClassName === 'light'
-                                            ? 'dark'
-                                            : 'light'
+                                        isThemeLight ? 'dark' : 'light'
                                     } mode`}
                                 </span>
                             </Button>

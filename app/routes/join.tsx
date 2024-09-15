@@ -4,7 +4,13 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { signUpSchema } from '~/utils/validations';
 import { login } from '~/utils/auth.server';
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
-import { Button, Container, TextField } from '@radix-ui/themes';
+import {
+    Button,
+    Container,
+    Heading,
+    TextField,
+    Link as RadixLink
+} from '@radix-ui/themes';
 
 export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
@@ -30,8 +36,10 @@ export default function JoinRoute() {
     });
 
     return (
-        <Container className="pt-12">
-            <h1 className="text-4xl font-bold mb-8">Join</h1>
+        <Container>
+            <Heading as="h1" className="text-4xl font-bold mb-8">
+                Join
+            </Heading>
             <Form
                 method="POST"
                 {...getFormProps(form)}
@@ -53,13 +61,17 @@ export default function JoinRoute() {
                         })}
                     />
                 </div>
-                <Button type="submit">Sign in</Button>
+                <Button type="submit" variant="solid">
+                    Sign in
+                </Button>
             </Form>
             <p>
                 {`Don't have an account?`}
-                <Link to="/join" className="pl-2 text-blue-500">
-                    Click to join
-                </Link>
+                <RadixLink asChild>
+                    <Link to="/join" className="pl-2">
+                        Click to join
+                    </Link>
+                </RadixLink>
             </p>
         </Container>
     );

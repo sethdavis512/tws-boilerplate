@@ -1,4 +1,7 @@
 export enum Paths {
+    ABOUT = '/about',
     HOME = '/',
-    DASHBOARD = '/dashboard'
+    DASHBOARD = '/dashboard',
+    LOGIN = '/login',
+    LOGOUT = '/logout'
 }

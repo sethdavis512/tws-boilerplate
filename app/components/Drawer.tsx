@@ -1,4 +1,4 @@
-import { PropsWithChildren, type ReactNode } from 'react';
+import { PropsWithChildren } from 'react';
 import { IconButton } from '@radix-ui/themes';
 import {
     PanelBottomCloseIcon,
@@ -98,7 +98,7 @@ export function Drawer({
             >
                 <div className="flex flex-col h-full">
                     <div className="border-b dark:border-zinc-700 p-4">
-                        <IconButton onClick={handleClose}>
+                        <IconButton onClick={handleClose} variant="soft">
                             {orientedIcon}
                         </IconButton>
                     </div>

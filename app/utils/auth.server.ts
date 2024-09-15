@@ -99,7 +99,7 @@ function getUserSession(request: Request) {
     return storage.getSession(request.headers.get('Cookie'));
 }
 
-async function getUserId(request: Request) {
+export async function getUserId(request: Request) {
     const session = await getUserSession(request);
     const userId = session.get('userId');
 
@@ -130,7 +130,7 @@ export async function getUser(request: Request) {
 export async function logout(request: Request) {
     const session = await getUserSession(request);
 
-    return redirect('/sign-in', {
+    return redirect(Paths.LOGIN, {
         headers: {
             'Set-Cookie': await storage.destroySession(session)
         }

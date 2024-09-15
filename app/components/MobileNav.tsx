@@ -5,10 +5,10 @@ import { NavLink, useNavigate } from '@remix-run/react';
 import { NavLinkType } from './DesktopNav';
 
 export default function MobileNav({
-    navLinks,
+    links,
     toggleDrawer
 }: {
-    navLinks: NavLinkType[];
+    links: NavLinkType[];
     toggleDrawer: Dispatch<boolean>;
 }) {
     const navigate = useNavigate();
@@ -20,7 +20,7 @@ export default function MobileNav({
 
     return (
         <ul className="space-y-2">
-            {navLinks.map((linkObj) => (
+            {links.map((linkObj) => (
                 <li key={linkObj.id}>
                     <RadixLink asChild>
                         <NavLink

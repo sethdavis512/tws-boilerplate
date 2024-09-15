@@ -12,13 +12,13 @@ export interface NavLinkType {
 }
 
 interface DesktopNavProps {
-    navLinks: NavLinkType[];
+    links: NavLinkType[];
 }
 
-export default function DesktopNav({ navLinks }: DesktopNavProps) {
+export default function DesktopNav({ links }: DesktopNavProps) {
     return (
         <ul className="hidden sm:flex sm:gap-4 sm:items-center">
-            {navLinks.map((linkObj) => {
+            {links.map((linkObj) => {
                 if (!linkObj.show) {
                     return null;
                 }

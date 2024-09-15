@@ -99,7 +99,7 @@ export function Layout({ children }: PropsWithChildren) {
                                 <RadixLink asChild weight="bold">
                                     <Link to={Paths.HOME}>TWS</Link>
                                 </RadixLink>
-                                <DesktopNav navLinks={navLinksArr} />
+                                <DesktopNav links={navLinksArr} />
                             </div>
                             <ul className="hidden sm:flex items-center gap-4">
                                 {user ? (
@@ -158,7 +158,7 @@ export function Layout({ children }: PropsWithChildren) {
                     >
                         <div className="p-4">
                             <MobileNav
-                                navLinks={navLinksArr}
+                                links={navLinksArr}
                                 toggleDrawer={toggleDrawerOpen}
                             />
                         </div>

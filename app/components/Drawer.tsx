@@ -1,5 +1,5 @@
-import { type ReactNode } from 'react';
-import { Button, IconButton } from '@radix-ui/themes';
+import { PropsWithChildren, type ReactNode } from 'react';
+import { IconButton } from '@radix-ui/themes';
 import {
     PanelBottomCloseIcon,
     PanelLeftCloseIcon,
@@ -8,10 +8,10 @@ import {
 import { cva, cx } from 'cva.config';
 
 interface DrawerProps {
-    children: ReactNode;
     id: string;
     backdrop?: boolean;
     className?: string;
+    containerClassName: string;
     heading?: string;
     isOpen?: boolean;
     handleClose?: () => void;
@@ -66,15 +66,16 @@ const drawerVariants = cva({
 export function Drawer({
     children,
     className,
+    containerClassName,
     id,
     isOpen = false,
     position = 'left',
     handleClose = () => {},
     backdrop = true,
     size = 'sm'
-}: DrawerProps) {
+}: PropsWithChildren<DrawerProps>) {
     const drawerClassName = cx(
-        `fixed z-50 overflow-y-auto transition-transform delay-250 bg-zinc-900 border-r dark:border-r-zinc-700`,
+        `fixed z-50 overflow-y-auto transition-transform delay-250 bg-white dark:bg-zinc-900 border-r dark:border-r-zinc-700`,
         drawerVariants({ position, className, size, isOpen })
     );
 
@@ -95,13 +96,15 @@ export function Drawer({
                 tabIndex={-1}
                 aria-labelledby={`${id}-label`}
             >
-                <div className="flex flex-col">
-                    <div className="border-b border-zinc-700 p-4">
+                <div className="flex flex-col h-full">
+                    <div className="border-b dark:border-zinc-700 p-4">
                         <IconButton onClick={handleClose}>
                             {orientedIcon}
                         </IconButton>
                     </div>
-                    <div className="p-4">{children}</div>
+                    <div className={cx('p-4 flex-grow', containerClassName)}>
+                        {children}
+                    </div>
                 </div>
             </div>
             {backdrop && (

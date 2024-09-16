@@ -3,11 +3,16 @@ import {
     LoaderFunctionArgs,
     redirect
 } from '@remix-run/node';
-import { Form, Link } from '@remix-run/react';
+import { Form, Link, useActionData } from '@remix-run/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { loginSchema } from '~/utils/validations';
 import { getUser, login } from '~/utils/auth.server';
-import { getFormProps, getInputProps, useForm } from '@conform-to/react';
+import {
+    getFormProps,
+    getInputProps,
+    SubmissionResult,
+    useForm
+} from '@conform-to/react';
 import {
     Button,
     Container,
@@ -26,7 +31,6 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const submission = parseWithZod(formData, { schema: loginSchema });
 
-    // Report the submission to client if it is not successful
     if (submission.status !== 'success') {
         return submission.reply();
     }
@@ -34,11 +38,12 @@ export async function action({ request }: ActionFunctionArgs) {
     return await login(submission.value);
 }
 
-export default function Route() {
+export default function LoginRoute() {
+    const lastResult = useActionData<typeof action>();
+
     const [form, fields] = useForm({
         constraint: getZodConstraint(loginSchema),
-        shouldValidate: 'onBlur',
-        shouldRevalidate: 'onInput'
+        lastResult: lastResult as SubmissionResult<string[]>
     });
 
     return (
@@ -55,18 +60,45 @@ export default function Route() {
                     <div>
                         <label htmlFor="email">Email</label>
                         <TextField.Root
-                            // placeholder="Search the docs…"
-                            {...getInputProps(fields.email, { type: 'email' })}
+                            {...getInputProps(fields.email, {
+                                name: 'email',
+                                type: 'email'
+                            })}
                         />
+                        {lastResult?.error &&
+                            (lastResult?.error as { email?: string }).email && (
+                                <p className="text-red-500">
+                                    {
+                                        (
+                                            lastResult?.error as {
+                                                email?: string;
+                                            }
+                                        ).email
+                                    }
+                                </p>
+                            )}
                     </div>
                     <div>
                         <label htmlFor="password">Password</label>
                         <TextField.Root
-                            // placeholder="Search the docs…"
                             {...getInputProps(fields.password, {
+                                name: 'password',
                                 type: 'password'
                             })}
                         />
+                        {lastResult?.error &&
+                            (lastResult?.error as { password?: string })
+                                .password && (
+                                <p className="text-red-500">
+                                    {
+                                        (
+                                            lastResult?.error as {
+                                                password?: string;
+                                            }
+                                        ).password
+                                    }
+                                </p>
+                            )}
                     </div>
                     <Button type="submit" variant="solid">
                         Sign in

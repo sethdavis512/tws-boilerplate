@@ -3,5 +3,6 @@ export enum Paths {
     HOME = '/',
     DASHBOARD = '/dashboard',
     LOGIN = '/login',
-    LOGOUT = '/logout'
+    LOGOUT = '/logout',
+    JOIN = '/join'
 }

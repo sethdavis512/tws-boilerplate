@@ -1,8 +1,7 @@
-import { ActionFunctionArgs, json } from '@remix-run/node';
+import { ActionFunctionArgs, json, redirect } from '@remix-run/node';
 import { Form, Link } from '@remix-run/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { signUpSchema } from '~/utils/validations';
-import { login } from '~/utils/auth.server';
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import {
     Button,
@@ -11,6 +10,8 @@ import {
     TextField,
     Link as RadixLink
 } from '@radix-ui/themes';
+import { Paths } from '~/utils/constants';
+import { createUser } from '~/models/user.server';
 
 export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
@@ -21,7 +22,13 @@ export async function action({ request }: ActionFunctionArgs) {
         return submission.reply();
     }
 
-    return await login(submission.value);
+    const user = await createUser(submission.value);
+
+    if (user) {
+        return redirect(Paths.DASHBOARD);
+    }
+
+    return redirect(Paths.JOIN);
 }
 
 export async function loader() {
@@ -47,9 +54,24 @@ export default function JoinRoute() {
                     className="space-y-3 mb-8"
                 >
                     <div className="space-y-2">
+                        <label htmlFor="firstName">First name</label>
+                        <TextField.Root
+                            {...getInputProps(fields.firstName, {
+                                type: 'text'
+                            })}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label htmlFor="lastName">Last name</label>
+                        <TextField.Root
+                            {...getInputProps(fields.lastName, {
+                                type: 'text'
+                            })}
+                        />
+                    </div>
+                    <div className="space-y-2">
                         <label htmlFor="email">Email</label>
                         <TextField.Root
-                            // placeholder="Search the docs…"
                             {...getInputProps(fields.email, { type: 'email' })}
                         />
                     </div>
@@ -63,14 +85,14 @@ export default function JoinRoute() {
                         />
                     </div>
                     <Button type="submit" variant="solid">
-                        Sign in
+                        Sign up
                     </Button>
                 </Form>
                 <p>
-                    {`Don't have an account? `}
+                    {`Have an account? `}
                     <RadixLink asChild>
-                        <Link to="/join" className="pl-2">
-                            Click to join
+                        <Link to={Paths.LOGIN} className="pl-2">
+                            Click to login
                         </Link>
                     </RadixLink>
                 </p>

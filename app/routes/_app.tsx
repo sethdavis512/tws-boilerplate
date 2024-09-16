@@ -16,8 +16,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function AppLayoutRoute() {
     return (
-        <div className="bg-zinc-100">
+        <>
             <Outlet />
-        </div>
+        </>
     );
 }

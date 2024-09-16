@@ -15,18 +15,18 @@ import { ThemePanel, Theme, Button, Container } from '@radix-ui/themes';
 import { MoonIcon, SunIcon } from 'lucide-react';
 
 import { Drawer } from './components/Drawer';
+import { getThemeSession } from './utils/theme.server';
 import { getUniqueId } from './utils/string';
 import { getUser } from './utils/auth.server';
+import { NavLinkType } from './components/DesktopNav';
 import { Paths } from './utils/constants';
 import { useOptionalUser } from './hooks/useOptionalUser';
-import { NavLinkType } from './components/DesktopNav';
+import Header from './components/Header';
 import MobileNav from './components/MobileNav';
 import useToggle from './hooks/useToggle';
-import { getThemeSession } from './utils/theme.server';
 
 import './tailwind.css';
 import '@radix-ui/themes/styles.css';
-import Header from './components/Header';
 
 const themePanelEnabled = process.env.NODE_ENV === 'development';
 

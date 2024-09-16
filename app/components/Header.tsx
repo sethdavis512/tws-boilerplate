@@ -18,7 +18,7 @@ export default function Header({ toggleDrawer, links }: HeaderProps) {
     const isThemeLight = data?.theme === 'light';
 
     return (
-        <header className="border-b dark:border-b-zinc-700 px-4 py-4">
+        <header className="border-b border-b-zinc-300 dark:border-b-zinc-700 px-4 py-4">
             <nav>
                 <Container>
                     <div className="flex items-center justify-between">

@@ -100,8 +100,10 @@ export function Layout({ children }: PropsWithChildren) {
                         links={getNavLinks(user)}
                         toggleDrawer={toggleDrawerOpen}
                     />
-                    <main className="flex-1 p-4">{children}</main>
-                    <footer className="border-t dark:border-t-zinc-700 px-4 py-8">
+                    <main className="flex-1 p-4 bg-zinc-200 dark:bg-zinc-900">
+                        {children}
+                    </main>
+                    <footer className="border-t border-t-zinc-300 dark:border-t-zinc-700 px-4 py-8">
                         <Container>Fooooter</Container>
                     </footer>
                     <Drawer

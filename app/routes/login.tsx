@@ -16,6 +16,7 @@ import {
     Link as RadixLink
 } from '@radix-ui/themes';
 import { Paths } from '../utils/constants';
+import Divider from '~/components/Divider';
 
 export async function loader({ request }: LoaderFunctionArgs) {
     return (await getUser(request)) ? redirect(Paths.DASHBOARD) : null;
@@ -42,23 +43,23 @@ export default function Route() {
 
     return (
         <Container>
-            <div className="max-w-lg mx-auto border dark:border-zinc-700 p-4 rounded-lg bg-white dark:bg-zinc-800">
+            <div className="max-w-lg mx-auto border dark:border-zinc-700 p-4 rounded-lg bg-white dark:bg-zinc-800 my-8">
                 <Heading as="h1" className="text-4xl font-bold mb-8">
                     Login
                 </Heading>
                 <Form
                     method="POST"
                     {...getFormProps(form)}
-                    className="space-y-3 mb-8"
+                    className="space-y-4 mb-8"
                 >
-                    <div className="space-y-2">
+                    <div>
                         <label htmlFor="email">Email</label>
                         <TextField.Root
                             // placeholder="Search the docs…"
                             {...getInputProps(fields.email, { type: 'email' })}
                         />
                     </div>
-                    <div className="space-y-2">
+                    <div>
                         <label htmlFor="password">Password</label>
                         <TextField.Root
                             // placeholder="Search the docs…"
@@ -71,7 +72,8 @@ export default function Route() {
                         Sign in
                     </Button>
                 </Form>
-                <p>
+                <Divider />
+                <p className="py-2">
                     {`Don't have an account? `}
                     <RadixLink asChild>
                         <Link to="/join" className="pl-2 underline">

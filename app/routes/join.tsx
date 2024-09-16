@@ -12,6 +12,7 @@ import {
 } from '@radix-ui/themes';
 import { Paths } from '~/utils/constants';
 import { createUser } from '~/models/user.server';
+import Divider from '~/components/Divider';
 
 export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
@@ -44,7 +45,7 @@ export default function JoinRoute() {
 
     return (
         <Container>
-            <div className="max-w-lg mx-auto border dark:border-zinc-700 p-4 rounded-lg bg-white dark:bg-zinc-800">
+            <div className="max-w-lg mx-auto border dark:border-zinc-700 p-4 rounded-lg bg-white dark:bg-zinc-800 my-8">
                 <Heading as="h1" className="text-4xl font-bold mb-8">
                     Join
                 </Heading>
@@ -88,7 +89,8 @@ export default function JoinRoute() {
                         Sign up
                     </Button>
                 </Form>
-                <p>
+                <Divider />
+                <p className="py-2">
                     {`Have an account? `}
                     <RadixLink asChild>
                         <Link to={Paths.LOGIN} className="pl-2">

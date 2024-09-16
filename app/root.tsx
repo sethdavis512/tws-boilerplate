@@ -93,7 +93,7 @@ export function Layout({ children }: PropsWithChildren) {
                 <Links />
             </head>
             <body>
-                <Theme className={`flex flex-col`}>
+                <Theme className="flex flex-col">
                     <header className="border-b dark:border-b-zinc-700 px-4 py-4">
                         <nav>
                             <Container>

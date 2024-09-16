@@ -2,33 +2,24 @@ import { PropsWithChildren } from 'react';
 import { User } from '@prisma/client';
 import {
     json,
-    Link,
     Links,
     Meta,
     Outlet,
     Scripts,
     ScrollRestoration,
     useFetcher,
-    useLoaderData,
     useRouteLoaderData
 } from '@remix-run/react';
 import type { LoaderFunctionArgs } from '@remix-run/node';
-import {
-    IconButton,
-    ThemePanel,
-    Theme,
-    Button,
-    Link as RadixLink,
-    Container
-} from '@radix-ui/themes';
-import { MenuIcon, MoonIcon, SunIcon } from 'lucide-react';
+import { ThemePanel, Theme, Button, Container } from '@radix-ui/themes';
+import { MoonIcon, SunIcon } from 'lucide-react';
 
 import { Drawer } from './components/Drawer';
 import { getUniqueId } from './utils/string';
 import { getUser } from './utils/auth.server';
 import { Paths } from './utils/constants';
 import { useOptionalUser } from './hooks/useOptionalUser';
-import DesktopNav, { NavLinkType } from './components/DesktopNav';
+import { NavLinkType } from './components/DesktopNav';
 import MobileNav from './components/MobileNav';
 import useToggle from './hooks/useToggle';
 import { getThemeSession } from './utils/theme.server';
@@ -37,7 +28,7 @@ import './tailwind.css';
 import '@radix-ui/themes/styles.css';
 import Header from './components/Header';
 
-const themePanelOn = process.env.NODE_ENV === 'development';
+const themePanelEnabled = process.env.NODE_ENV === 'development';
 
 const getNavLinks = (user: User | undefined): NavLinkType[] =>
     [
@@ -139,7 +130,7 @@ export function Layout({ children }: PropsWithChildren) {
                             </themeFetcher.Form>
                         </div>
                     </Drawer>
-                    {themePanelOn && <ThemePanel defaultOpen={false} />}
+                    {themePanelEnabled && <ThemePanel defaultOpen={false} />}
                 </Theme>
                 <ScrollRestoration />
                 <Scripts />
@@ -149,7 +140,5 @@ export function Layout({ children }: PropsWithChildren) {
 }
 
 export default function App() {
-    const { theme, user } = useLoaderData<typeof loader>();
-
-    return <Outlet context={{ theme, user }} />;
+    return <Outlet />;
 }

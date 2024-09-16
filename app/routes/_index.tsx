@@ -23,7 +23,9 @@ export default function Index() {
                     }}
                 />
             </AspectRatio>
-            <Heading as="h1">Welcome</Heading>
+            <Heading as="h1" weight="bold" size="7">
+                Welcome
+            </Heading>
         </Container>
     );
 }

@@ -44,7 +44,7 @@ export default function Route() {
     return (
         <Container>
             <div className="max-w-lg mx-auto border border-zinc-300 dark:border-zinc-700 p-4 rounded-lg bg-white dark:bg-zinc-800 my-8">
-                <Heading as="h1" className="text-4xl font-bold mb-8">
+                <Heading as="h1" weight="bold" size="7" className="mb-8">
                     Login
                 </Heading>
                 <Form

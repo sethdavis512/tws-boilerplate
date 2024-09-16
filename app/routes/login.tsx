@@ -72,7 +72,7 @@ export default function Route() {
                     </Button>
                 </Form>
                 <p>
-                    {`Don't have an account?`}
+                    {`Don't have an account? `}
                     <RadixLink asChild>
                         <Link to="/join" className="pl-2 underline">
                             Click to join

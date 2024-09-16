@@ -17,7 +17,7 @@ interface DesktopNavProps {
 
 export default function DesktopNav({ links }: DesktopNavProps) {
     return (
-        <ul className="hidden sm:flex sm:gap-4 sm:items-center">
+        <ul className="hidden sm:flex sm:gap-4">
             {links.map((linkObj) => {
                 if (!linkObj.show) {
                     return null;

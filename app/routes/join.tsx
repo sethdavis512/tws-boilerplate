@@ -37,42 +37,44 @@ export default function JoinRoute() {
 
     return (
         <Container>
-            <Heading as="h1" className="text-4xl font-bold mb-8">
-                Join
-            </Heading>
-            <Form
-                method="POST"
-                {...getFormProps(form)}
-                className="space-y-3 mb-8"
-            >
-                <div className="space-y-2">
-                    <label htmlFor="email">Email</label>
-                    <TextField.Root
-                        // placeholder="Search the docs…"
-                        {...getInputProps(fields.email, { type: 'email' })}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label htmlFor="password">Password</label>
-                    <TextField.Root
-                        // placeholder="Search the docs…"
-                        {...getInputProps(fields.password, {
-                            type: 'password'
-                        })}
-                    />
-                </div>
-                <Button type="submit" variant="solid">
-                    Sign in
-                </Button>
-            </Form>
-            <p>
-                {`Don't have an account?`}
-                <RadixLink asChild>
-                    <Link to="/join" className="pl-2">
-                        Click to join
-                    </Link>
-                </RadixLink>
-            </p>
+            <div className="max-w-lg mx-auto border dark:border-zinc-700 p-4 rounded-lg bg-white dark:bg-zinc-800">
+                <Heading as="h1" className="text-4xl font-bold mb-8">
+                    Join
+                </Heading>
+                <Form
+                    method="POST"
+                    {...getFormProps(form)}
+                    className="space-y-3 mb-8"
+                >
+                    <div className="space-y-2">
+                        <label htmlFor="email">Email</label>
+                        <TextField.Root
+                            // placeholder="Search the docs…"
+                            {...getInputProps(fields.email, { type: 'email' })}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label htmlFor="password">Password</label>
+                        <TextField.Root
+                            // placeholder="Search the docs…"
+                            {...getInputProps(fields.password, {
+                                type: 'password'
+                            })}
+                        />
+                    </div>
+                    <Button type="submit" variant="solid">
+                        Sign in
+                    </Button>
+                </Form>
+                <p>
+                    {`Don't have an account? `}
+                    <RadixLink asChild>
+                        <Link to="/join" className="pl-2">
+                            Click to join
+                        </Link>
+                    </RadixLink>
+                </p>
+            </div>
         </Container>
     );
 }

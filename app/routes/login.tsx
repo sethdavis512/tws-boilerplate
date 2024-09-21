@@ -7,12 +7,7 @@ import { Form, Link, useActionData } from '@remix-run/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { loginSchema } from '~/utils/validations';
 import { getUser, login } from '~/utils/auth.server';
-import {
-    getFormProps,
-    getInputProps,
-    SubmissionResult,
-    useForm
-} from '@conform-to/react';
+import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import {
     Button,
     Container,
@@ -35,6 +30,10 @@ export async function action({ request }: ActionFunctionArgs) {
         return submission.reply();
     }
 
+    // return submission.reply({
+    //     formErrors: ['Incorrect username or password']
+    // });
+
     return await login(submission.value);
 }
 
@@ -42,8 +41,13 @@ export default function LoginRoute() {
     const lastResult = useActionData<typeof action>();
 
     const [form, fields] = useForm({
+        id: 'loginForm',
         constraint: getZodConstraint(loginSchema),
-        lastResult: lastResult as SubmissionResult<string[]>
+        shouldValidate: 'onBlur',
+        lastResult,
+        onValidate({ formData }) {
+            return parseWithZod(formData, { schema: loginSchema });
+        }
     });
 
     return (
@@ -57,6 +61,9 @@ export default function LoginRoute() {
                     {...getFormProps(form)}
                     className="space-y-4 mb-8"
                 >
+                    <div className={form.errors ? 'visible' : 'invisible'}>
+                        {form.errors}
+                    </div>
                     <div>
                         <label htmlFor="email">Email</label>
                         <TextField.Root
@@ -65,18 +72,11 @@ export default function LoginRoute() {
                                 type: 'email'
                             })}
                         />
-                        {lastResult?.error &&
-                            (lastResult?.error as { email?: string }).email && (
-                                <p className="text-red-500">
-                                    {
-                                        (
-                                            lastResult?.error as {
-                                                email?: string;
-                                            }
-                                        ).email
-                                    }
-                                </p>
-                            )}
+                        {fields.email.errors && (
+                            <p className="text-red-500">
+                                {fields.email.errors}
+                            </p>
+                        )}
                     </div>
                     <div>
                         <label htmlFor="password">Password</label>
@@ -86,19 +86,11 @@ export default function LoginRoute() {
                                 type: 'password'
                             })}
                         />
-                        {lastResult?.error &&
-                            (lastResult?.error as { password?: string })
-                                .password && (
-                                <p className="text-red-500">
-                                    {
-                                        (
-                                            lastResult?.error as {
-                                                password?: string;
-                                            }
-                                        ).password
-                                    }
-                                </p>
-                            )}
+                        {fields.password.errors && (
+                            <p className="text-red-500">
+                                {fields.password.errors}
+                            </p>
+                        )}
                     </div>
                     <Button type="submit" variant="solid">
                         Sign in

@@ -11,7 +11,13 @@ import {
     useRouteLoaderData
 } from '@remix-run/react';
 import type { LoaderFunctionArgs } from '@remix-run/node';
-import { ThemePanel, Theme, Button, Container } from '@radix-ui/themes';
+import {
+    ThemePanel,
+    Theme,
+    Button,
+    Container,
+    Link as RadixLink
+} from '@radix-ui/themes';
 import { MoonIcon, SunIcon } from 'lucide-react';
 
 import { Drawer } from './components/Drawer';
@@ -75,7 +81,7 @@ export function Layout({ children }: PropsWithChildren) {
     const navLinksArr = getNavLinks(user);
 
     return (
-        <html lang="en" className={data?.theme}>
+        <html lang="en" className={`${data?.theme} bg-zinc-700`}>
             <head>
                 <meta charSet="utf-8" />
                 <meta
@@ -95,7 +101,12 @@ export function Layout({ children }: PropsWithChildren) {
                         {children}
                     </main>
                     <footer className="border-t border-t-zinc-300 dark:border-t-zinc-700 px-4 py-8">
-                        <Container>Fooooter</Container>
+                        <Container>
+                            Created by{' '}
+                            <RadixLink href="https://twitter.com/sethdavis512">
+                                @sethdavis512
+                            </RadixLink>
+                        </Container>
                     </footer>
                     <Drawer
                         id="mobileNav"

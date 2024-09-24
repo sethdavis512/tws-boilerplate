@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from '@remix-run/node';
 
-import { isTheme, Theme } from './theme';
+import { isTheme, ThemeTypes } from './theme';
 
 // Make use to set the environment variable SESSION_SECRET before running the code
 const sessionSecret = process.env.SESSION_SECRET ?? 'DEFAULT_SECRET';
@@ -24,9 +24,9 @@ async function getThemeSession(request: Request) {
     return {
         getTheme: () => {
             const themeValue = session.get('theme');
-            return isTheme(themeValue) ? themeValue : Theme.LIGHT;
+            return isTheme(themeValue) ? themeValue : ThemeTypes.LIGHT;
         },
-        setTheme: (theme: Theme) => session.set('theme', theme),
+        setTheme: (theme: ThemeTypes) => session.set('theme', theme),
         commit: () => themeStorage.commitSession(session)
     };
 }

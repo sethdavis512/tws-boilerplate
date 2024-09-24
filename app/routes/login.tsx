@@ -6,17 +6,20 @@ import {
 import { Form, Link, useActionData } from '@remix-run/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { loginSchema } from '~/utils/validations';
-import { getUser, login } from '~/utils/auth.server';
+import { createUserSession, getUser } from '~/utils/auth.server';
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import {
     Button,
     Container,
     Heading,
     TextField,
-    Link as RadixLink
+    Link as RadixLink,
+    Callout
 } from '@radix-ui/themes';
 import { Paths } from '../utils/constants';
 import Divider from '~/components/Divider';
+import { verifyLogin } from '~/models/user.server';
+import { InfoIcon } from 'lucide-react';
 
 export async function loader({ request }: LoaderFunctionArgs) {
     return (await getUser(request)) ? redirect(Paths.DASHBOARD) : null;
@@ -26,15 +29,18 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const submission = parseWithZod(formData, { schema: loginSchema });
 
-    if (submission.status !== 'success') {
-        return submission.reply();
+    const user = await verifyLogin(
+        String(formData.get('email')),
+        String(formData.get('password'))
+    );
+
+    if (submission.status !== 'success' || !user) {
+        return submission.reply({
+            formErrors: ['Incorrect username or password']
+        });
     }
 
-    // return submission.reply({
-    //     formErrors: ['Incorrect username or password']
-    // });
-
-    return await login(submission.value);
+    return await createUserSession(user.id, Paths.DASHBOARD);
 }
 
 export default function LoginRoute() {
@@ -61,8 +67,13 @@ export default function LoginRoute() {
                     {...getFormProps(form)}
                     className="space-y-4 mb-8"
                 >
-                    <div className={form.errors ? 'visible' : 'invisible'}>
-                        {form.errors}
+                    <div className={form.errors ? 'block' : 'hidden'}>
+                        <Callout.Root variant="soft" color="red">
+                            <Callout.Icon>
+                                <InfoIcon />
+                            </Callout.Icon>
+                            <Callout.Text>{form.errors}</Callout.Text>
+                        </Callout.Root>
                     </div>
                     <div>
                         <label htmlFor="email">Email</label>

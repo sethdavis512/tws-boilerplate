@@ -3,7 +3,7 @@ import {
     LoaderFunctionArgs,
     redirect
 } from '@remix-run/node';
-import { Form, Link, useActionData } from '@remix-run/react';
+import { Form, Link, useActionData, useSearchParams } from '@remix-run/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { loginSchema } from '~/utils/validations';
 import { createUserSession, getUser } from '~/utils/auth.server';
@@ -20,6 +20,7 @@ import { Paths } from '../utils/constants';
 import Divider from '~/components/Divider';
 import { verifyLogin } from '~/models/user.server';
 import { InfoIcon } from 'lucide-react';
+import { safeRedirect } from '~/utils/routing';
 
 export async function loader({ request }: LoaderFunctionArgs) {
     return (await getUser(request)) ? redirect(Paths.DASHBOARD) : null;
@@ -28,6 +29,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const submission = parseWithZod(formData, { schema: loginSchema });
+    const redirectTo = safeRedirect(
+        formData.get('redirectTo'),
+        Paths.DASHBOARD
+    );
 
     const user = await verifyLogin(
         String(formData.get('email')),
@@ -40,16 +45,18 @@ export async function action({ request }: ActionFunctionArgs) {
         });
     }
 
-    return await createUserSession(user.id, Paths.DASHBOARD);
+    return await createUserSession(user.id, redirectTo);
 }
 
 export default function LoginRoute() {
+    const [searchParams] = useSearchParams();
+    const redirectTo = searchParams.get('redirectTo') || Paths.DASHBOARD;
+
     const lastResult = useActionData<typeof action>();
 
     const [form, fields] = useForm({
         id: 'loginForm',
         constraint: getZodConstraint(loginSchema),
-        shouldValidate: 'onBlur',
         lastResult,
         onValidate({ formData }) {
             return parseWithZod(formData, { schema: loginSchema });
@@ -67,6 +74,7 @@ export default function LoginRoute() {
                     {...getFormProps(form)}
                     className="space-y-4 mb-8"
                 >
+                    <input type="hidden" name="redirectTo" value={redirectTo} />
                     <div className={form.errors ? 'block' : 'hidden'}>
                         <Callout.Root variant="soft" color="red">
                             <Callout.Icon>

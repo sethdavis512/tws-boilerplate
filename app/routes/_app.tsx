@@ -1,16 +1,10 @@
-import { LoaderFunctionArgs, redirect } from '@remix-run/node';
+import { LoaderFunctionArgs } from '@remix-run/node';
 import { Outlet } from '@remix-run/react';
 
-import { getUserId } from '~/utils/auth.server';
-import { Paths } from '~/utils/constants';
+import { requireUserId } from '~/utils/auth.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    const userId = await getUserId(request);
-
-    if (!userId) {
-        return redirect(Paths.LOGIN);
-    }
-
+    await requireUserId(request);
     return null;
 }
 

@@ -12,3 +12,19 @@ export function getUniqueId(
 
     return `${prefix ? `${prefix}-` : ''}${hash}`;
 }
+
+export function getEnvVariable(key: string | undefined): string {
+    if (key === undefined) {
+        throw Error(`"Key is undefined`);
+    }
+
+    const value = process.env[key];
+
+    if (!value) {
+        throw Error(
+            `Environment variable "${key}" does not exist on process.env`
+        );
+    }
+
+    return value;
+}

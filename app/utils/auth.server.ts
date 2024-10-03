@@ -5,12 +5,9 @@ import { prisma } from '../db.server';
 import { LoginForm, RegisterForm } from './types.server';
 import { createUser } from '~/models/user.server';
 import { Paths } from './constants';
+import { getEnvVariable } from './string';
 
-const sessionSecret = process.env.SESSION_SECRET;
-
-if (!sessionSecret) {
-    throw new Error('SESSION_SECRET must be set');
-}
+const sessionSecret = getEnvVariable('SESSION_SECRET');
 
 const storage = createCookieSessionStorage({
     cookie: {
